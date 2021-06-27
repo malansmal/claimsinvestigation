@@ -1,0 +1,97 @@
+body
+{ background-color: #FFFFFF;
+  color: #79767a;
+}
+
+blockquote{border-color: #FF9C27;}
+
+#main
+{ background: #ffffff url(main2.png) repeat-y;
+  color: #79767A;
+}
+
+
+
+
+#links, #footer, #links a, #footer a, #links a:hover, #footer a:hover
+{ background: #EEEEEE;
+  color: #000000;
+  border-color: #0761a7;
+}
+
+
+
+#logo
+{ background: #FFFFFF url(../images/logo.jpg) no-repeat;
+  color: #79767a;
+  border-color: #FF9C27;
+  border:0px;
+}
+
+h1, #column1 h1, #column2 h1
+{ background: transparent;
+  color: #79767a;
+  border-color: #787878;
+}
+
+#menu
+{ background: #79767a;
+  color: #79767a;
+}
+
+<!--{ background: transparent;
+  color: #79767a; -->
+}
+
+#menu li a
+{
+
+
+background: #808080 url(../images/nav.gif);
+background-color: #808080;
+
+
+}
+
+.sidebaritem
+{ background: #FFFFFF;
+  color: #000000;
+  border-color: #787878;
+}
+
+/*#menu li a:hover, #menu li a#selected, #menu li a#selected:hover
+{ background: #FF9C27;
+  color: #FFF;
+}*/
+#menu li a:hover, #menu li a#selected, #menu li a#selected:hover
+{ color:#FFFFFF;
+}
+
+#content, #column2
+{ background: #FFFFFF;
+  color: #000000;
+  border-color: #0761a7;
+}
+
+#column2 a
+{ background: #FFFFFF;
+  color: #969696;
+  font-weight: bold;
+  border-color: #D5D2D6;
+}
+
+#column2 a:hover
+{ /*background: #414141;*/
+  color: #000000;
+  border-color: #FF9C27;
+}
+
+.sbilinks li a, .sidebaritem a
+{ background: #FFFFFF url(cog.png) no-repeat left center;
+  color: #000000;
+} 
+
+.sbilinks li a:hover, .sidebaritem a:hover
+{ background: #FFFFFF url(orange_cog.png) no-repeat left center;
+  color: #FF9C27;
+} 

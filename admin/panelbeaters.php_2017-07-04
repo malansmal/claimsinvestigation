@@ -1,0 +1,508 @@
+<?php
+
+	//echo "test";
+
+	function Panelbeaters($from)
+	{
+		require('connection.php');
+		
+		if ($from == "")
+		{
+			$from = 1;
+		}
+		
+			//display first 30
+		if ($from < 1)
+		{
+			$qry = "SELECT * FROM panelbeaters order by `name` LIMIT 0 , 30";
+		}	//end if
+		else
+		{
+			if ($from < 2)
+			{
+				$frm = $from - 1;
+			}
+			else
+			{
+				$frm = $from;
+			}
+			
+			$qry = "SELECT * FROM panelbeaters order by `name` LIMIT $frm , 30";
+		}	//end else
+		
+		$qrycountpanelbeaters = "select * from panelbeaters";
+		$qrycount = mysql_query($qrycountpanelbeaters, $db);
+		
+		$qrypanelbeaters = mysql_query($qry, $db);
+		$count = mysql_num_rows($qrycount);
+		
+		if ($count == 0)
+		{
+			echo "<p>There are no Panel Beaters in the database. Click <a href=\"loggedinaction.php?action=newpanelbeater\"><img src=\"../images/admin/add.gif\" border=\"0\" alt=\"Add new Panel Beater\" title=\"Add new Panel Beater\"></a> to add one.</p>";
+		}
+		else
+		{
+			
+			$pagesneeded = $count / 30;
+			$pagesneeded = ceil($pagesneeded);
+			$pageslinks = "<a href=\"loggedinaction.php?action=panelbeaters&amp;from=1\">Page 1</a> || ";
+			
+			//echo "pages that will be needed is $count today";
+			
+			if ($pagesneeded > 1)	//build next page links here
+			{
+				for ($i = 1; $i < $pagesneeded; $i++)
+				{
+					//echo "i is $i<br>";
+					$fromrecord = $i * 30;
+					$pagenumber = $i + 1;
+					$pageslinks = $pageslinks . "<a href=\"loggedinaction.php?action=panelbeaters&amp;from=" . $fromrecord . "\">Page $pagenumber</a> || ";
+				}	//end for loop
+			}	//end if
+			
+			$pageslinks = substr($pageslinks, 0, -4);
+			
+			echo "	<form action=\"loggedinaction.php?action=searchpanelbeaters\" method=\"post\" name=\"searchform\">
+						<strong>Search for a Panelbeater:</strong><br>
+						Panel Beater Namer: <input type=\"text\" name=\"pbname\"> 
+						Owner: <input type=\"text\" name=\"pbowner\"> <input type=\"submit\" value=\"Search\">
+						<input type=\"hidden\" name=\"from\" value=\"1\">
+					<br><br>
+					
+					</form>
+				  <table class=\"table table-striped\">
+						  <tr>
+							  <td><strong>Panel Beater</strong></td>
+							  <td><strong>Owner</strong></td>
+							  <td><strong>Costing Clerk</strong></td>
+							  <td><strong>Contact Person</strong></td>
+							  <td><strong>Address</strong></td>
+							  <td><strong>Contact No</strong></td>
+							  <td><strong>Fax No</strong></td>
+							  <td><strong>Email Address</strong></td>
+							  <td colspan=\"2\" align=\"center\"><strong>Actions</strong></td>
+						  </tr>";
+						  
+			while ($row = mysql_fetch_array($qrypanelbeaters)) 
+			{
+				// give a name to the fields
+				$pbid = $row['id'];
+				$name = stripslashes($row['name']);
+				$owner = stripslashes($row["owner"]);
+				$costingclerk = stripslashes($row["costingclerk"]);
+				$contactperson = stripslashes($row["contactperson"]);
+				$adr1 = stripslashes($row["adr1"]);
+				$adr2 = stripslashes($row["adr2"]);
+				$adr3 = stripslashes($row["adr3"]);
+				$adr4 = stripslashes($row["adr4"]);
+				$contactno = stripslashes($row["contactno"]);
+				$faxno = stripslashes($row["faxno"]);
+				$email = stripslashes($row["email"]);
+				
+				//echo the results onscreen
+				//echo "The ID is $users_id and the Username is $users_username and the Password is $users_password <br><br><br>";
+				
+				echo "<tr>
+						  <td valign=\"top\">$name</td>
+						  <td valign=\"top\">$owner</td>
+						  <td valign=\"top\">$costingclerk</td>
+						  <td valign=\"top\">$contactperson</td>
+						  <td valign=\"top\">$adr1 <br> $adr2 <br> $adr3 <br> $adr4</td>
+						  <td valign=\"top\">$contactno</td>
+						  <td valign=\"top\">$faxno</td>
+						  <td valign=\"top\">$email</td>
+						  <td align=\"center\"><a href=\"loggedinaction.php?action=editpanelbeater&amp;panelbeaterid=$pbid\"><img src=\"../images/admin/edit.gif\" alt=\"Edit this Panel Beater\" border=\"0\" title=\"Edit this Panel Beater\"></td>
+						  <td align=\"center\"><a href=\"loggedinaction.php?action=confirmdeletepanelbeater&amp;panelbeaterid=$pbid\"><img src=\"../images/admin/delete.gif\" alt=\"Delete this Panel Beater\" border=\"0\" title=\"Delete this Panel Beater\"></td>
+					  </tr>";
+				
+			}	//end while loop			
+			
+			echo "<tr>
+					  <td colspan=\"8\">&nbsp;</td>
+					  <td colspan=\"2\" align=\"center\"><a href=\"loggedinaction.php?action=newpanelbeater\"><img src=\"../images/admin/add.gif\" alt=\"Add new Panel Beater\" border=\"0\" title=\"Add new Panel Beater\"></a></td>
+				  </tr>
+			</table><br>$pageslinks<br>
+				";
+		}	
+	}
+	
+	function SearchPanelbeaters($pbname, $pbowner, $from)
+	{
+		require('connection.php');
+				
+		if ($from == "")
+		{
+			$from = 1;
+		}
+		
+			//display first 30
+		if ($from < 1)
+		{
+			$qry = "SELECT * FROM panelbeaters 
+										 where `name` like '%" . $pbname . "%' 
+										   and `owner` like '%" . $pbowner . "%' 
+										   order by `name` LIMIT 0 , 30";
+		}	//end if
+		else
+		{
+			if ($from < 2)
+			{
+				$frm = $from - 1;
+			}
+			else
+			{
+				$frm = $from;
+			}
+			
+			$qry = "SELECT * FROM panelbeaters 
+										 where `name` like '%" . $pbname . "%' 
+										   and `owner` like '%" . $pbowner . "%' 
+										   order by `name` LIMIT $frm , 30";
+		}	//end else
+		
+		$qrycountpanelbeaters = "SELECT * FROM panelbeaters 
+										 where `name` like '%" . $pbname . "%' 
+										   and `owner` like '%" . $pbowner . "%'";
+		$qrycount = mysql_query($qrycountpanelbeaters, $db);
+		
+		$qrypanelbeaters = mysql_query($qry, $db);
+		$count = mysql_num_rows($qrycount);
+		
+		if ($count == 0)
+		{
+			echo "<p>There are no Panel Beaters in the database with these search criteria. <a href=\"javascript.history.go(-1);\">Go Back to Panelbeaters</p>";
+		}
+		else
+		{
+			
+			$pagesneeded = $count / 30;
+			$pagesneeded = ceil($pagesneeded);
+			$pageslinks = "<table>
+								<tr><td>
+						   <form style=\"display:inline\" action=\"loggedinaction.php?action=searchpanelbeaters\" method=\"post\"> <input type=\"submit\" value=\"Page 1\"> 
+																									<input type=\"hidden\" name=\"pbname\" value=\"$pbname\">
+																									<input type=\"hidden\" name=\"pbowner\" value=\"$pbowner\">
+																									<input type=\"hidden\" name=\"from\" value=\"1\"></form>&nbsp;";
+			
+			//echo "pages that will be needed is $count today";
+			
+			if ($pagesneeded > 1)	//build next page links here
+			{
+				for ($i = 1; $i < $pagesneeded; $i++)
+				{
+					//echo "i is $i<br>";
+					$fromrecord = $i * 30;
+					$pagenumber = $i + 1;
+					$pageslinks = $pageslinks . "<form style=\"display:inline\" action=\"loggedinaction.php?action=searchpanelbeaters\" method=\"post\"> <input type=\"submit\" value=\"Page $pagenumber\"> 
+																									<input type=\"hidden\" name=\"pbname\" value=\"$pbname\">
+																									<input type=\"hidden\" name=\"pbowner\" value=\"$pbowner\">
+																									<input type=\"hidden\" name=\"from\" value=\"$fromrecord\"></form>&nbsp;";
+				}	//end for loop
+			}	//end if
+			
+			
+			
+			echo "Search results for Panelbeater Name: <strong>$pbname</strong> and owner:: <strong>$pbowner</strong><br><br>	<form action=\"loggedinaction.php?action=searchpanelbeaters\" method=\"post\" name=\"searchform\">
+						<strong>Search for a Panelbeater:</strong><br>
+						Panel Beater Namer: <input type=\"text\" name=\"pbname\"> 
+						Owner: <input type=\"text\" name=\"pbowner\"> <input type=\"submit\" value=\"Search\">
+						<input type=\"hidden\" name=\"from\" value=\"1\">
+					<br><br>
+					
+					</form>
+				  <table cellpadding=\"2\" cellspacing=\"0\" border=\"1\">
+						  <tr>
+							  <td><strong>Panel Beater</strong></td>
+							  <td><strong>Owner</strong></td>
+							  <td><strong>Costing Clerk</strong></td>
+							  <td><strong>Contact Person</strong></td>
+							  <td><strong>Address</strong></td>
+							  <td><strong>Contact No</strong></td>
+							  <td><strong>Fax No</strong></td>
+							  <td><strong>Email Address</strong></td>
+							  <td colspan=\"2\" align=\"center\"><strong>Actions</strong></td>
+						  </tr>";
+						  
+			while ($row = mysql_fetch_array($qrypanelbeaters)) 
+			{
+				// give a name to the fields
+				$pbid = $row['id'];
+				$name = stripslashes($row['name']);
+				$owner = stripslashes($row["owner"]);
+				$costingclerk = stripslashes($row["costingclerk"]);
+				$contactperson = stripslashes($row["contactperson"]);
+				$adr1 = stripslashes($row["adr1"]);
+				$adr2 = stripslashes($row["adr2"]);
+				$adr3 = stripslashes($row["adr3"]);
+				$adr4 = stripslashes($row["adr4"]);
+				$contactno = stripslashes($row["contactno"]);
+				$faxno = stripslashes($row["faxno"]);
+				$email = stripslashes($row["email"]);
+				
+				//echo the results onscreen
+				//echo "The ID is $users_id and the Username is $users_username and the Password is $users_password <br><br><br>";
+				
+				echo "<tr>
+						  <td valign=\"top\">$name</td>
+						  <td valign=\"top\">$owner</td>
+						  <td valign=\"top\">$costingclerk</td>
+						  <td valign=\"top\">$contactperson</td>
+						  <td valign=\"top\">$adr1 <br> $adr2 <br> $adr3 <br> $adr4</td>
+						  <td valign=\"top\">$contactno</td>
+						  <td valign=\"top\">$faxno</td>
+						  <td valign=\"top\">$email</td>
+						  <td align=\"center\"><a href=\"loggedinaction.php?action=editpanelbeater&amp;panelbeaterid=$pbid\"><img src=\"../images/admin/edit.gif\" alt=\"Edit this Panel Beater\" border=\"0\" title=\"Edit this Panel Beater\"></td>
+						  <td align=\"center\"><a href=\"loggedinaction.php?action=confirmdeletepanelbeater&amp;panelbeaterid=$pbid\"><img src=\"../images/admin/delete.gif\" alt=\"Delete this Panel Beater\" border=\"0\" title=\"Delete this Panel Beater\"></td>
+					  </tr>";
+				
+			}	//end while loop			
+			
+			echo "<tr>
+					  <td colspan=\"8\">&nbsp;</td>
+					  <td colspan=\"2\" align=\"center\"><a href=\"loggedinaction.php?action=newpanelbeater\"><img src=\"../images/admin/add.gif\" alt=\"Add new Panel Beater\" border=\"0\" title=\"Add new Panel Beater\"></a></td>
+				  </tr>
+			</table><br>$pageslinks<br>
+				";
+		}	
+	}
+	
+	function NewPanelbeater()
+	{
+		require('connection.php');
+		
+		echo "<form method=\"post\" action=\"loggedinaction.php?action=addnewpanelbeater\" name=\"theform\">
+								  <p>Enter the new Panel Beater details and click Save</p>
+								   	<table class=\"table table-striped\">
+								  		<tr>
+											<td>Name:</td>
+											<td><input type=\"text\" name=\"pbname\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>Owner:</td>
+											<td><input type=\"text\" name=\"pbowner\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>Costing Clerk:</td>
+											<td><input type=\"text\" name=\"pbcostingclerk\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>Contact Person</td>
+											<td><input type=\"text\" name=\"pbcontactperson\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>Address:</td>
+											<td><input type=\"text\" name=\"pbadr1\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td><input type=\"text\" name=\"pbadr2\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td><input type=\"text\" name=\"pbadr3\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td><input type=\"text\" name=\"pbadr4\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>Contact Number:</td>
+											<td><input type=\"text\" name=\"pbcontactno\" maxlength=\"50\"></td>
+										</tr>
+										<tr>
+											<td>Fax Number:</td>
+											<td><input type=\"text\" name=\"pbfaxno\" maxlength=\"50\"></td>
+										</tr>	
+										<tr>
+											<td>Email Address:</td>
+											<td><input type=\"text\" name=\"pbemail\" maxlength=\"255\"></td>
+										</tr>
+										<tr>
+											<td>Latitude:</td>
+											<td><input type=\"text\" name=\"latitude\" maxlength=\"50\" ></td>
+										</tr>
+										<tr>
+											<td>Longitude:</td>
+											<td><input type=\"text\" name=\"longitude\" maxlength=\"50\" ></td>
+										</tr>
+
+									</table>
+<br><input type=\"submit\" value=\"Save\"> <input type=\"reset\" value=\"Clear\">
+							  </form>";
+	}
+	
+	function AddNewPanelbeater($name, $owner, $costingclerk, $contactperson, $adr1, $adr2, $adr3, $adr4, $contactno, $faxno, $email, $latitude='', $longitude='')
+	{
+		require('connection.php');		
+		
+		$qryinsert = "insert into panelbeaters (`id`, `name`, `owner`, `costingclerk`, `contactperson`, `adr1`, `adr2`, `adr3`, `adr4`, `contactno`, `faxno`, `email`, `latitude`, `longitude`)
+										values ('', '$name', '$owner', '$costingclerk', '$contactperson', '$adr1', '$adr2', '$adr3', '$adr4', '$contactno', '$faxno', '$email', '$latitude', '$longitude')";
+		$qryinsertresults = mysql_query($qryinsert, $db);
+		
+		//echo $qryinsert;
+		
+		echo "<p>The Panel Beater has been saved successfully.</p>";
+		
+		PanelBeaters(1);
+		
+	}
+	
+	function EditPanelbeater($pbid)
+	{
+		require('connection.php');
+								
+		$qry = "select * from panelbeaters where id = $pbid";
+		$qryresults = mysql_query($qry, $db);
+		$row = mysql_fetch_array($qryresults);
+		
+		$name = stripslashes($row["name"]);
+		$owner = stripslashes($row["owner"]);
+		$costingclerk = stripslashes($row["costingclerk"]);
+		$contactperson = stripslashes($row["contactperson"]);
+		$adr1 = stripslashes($row["adr1"]);
+		$adr2 = stripslashes($row["adr2"]);
+		$adr3 = stripslashes($row["adr3"]);
+		$adr4 = stripslashes($row["adr4"]);
+		$contactno = stripslashes($row["contactno"]);
+		$faxno = stripslashes($row["faxno"]);
+		$email = stripslashes($row["email"]);
+		$latitude = stripslashes($row["latitude"]);
+		$longitude = stripslashes($row["longitude"]);
+
+		
+		echo "<form method=\"post\" action=\"loggedinaction.php?action=panelbeateredited\" name=\"theform\">
+				  <p>Enter the new Panel Beater details and click Save</p>
+					<table class=\"table table-striped\">
+						<tr>
+							<td>Name:</td>
+							<td><input type=\"text\" name=\"pbname\" maxlength=\"50\" value=\"$name\"></td>
+						</tr>
+						<tr>
+							<td>Owner:</td>
+							<td><input type=\"text\" name=\"pbowner\" maxlength=\"50\" value=\"$owner\"></td>
+						</tr>
+						<tr>
+							<td>Costing Clerk:</td>
+							<td><input type=\"text\" name=\"pbcostingclerk\" maxlength=\"50\" value=\"$costingclerk\"></td>
+						</tr>
+						<tr>
+							<td>Contact Person:</td>
+							<td><input type=\"text\" name=\"pbcontactperson\" maxlength=\"50\" value=\"$contactperson\"></td>
+						</tr>
+						<tr>
+							<td>Address:</td>
+							<td><input type=\"text\" name=\"pbadr1\" maxlength=\"50\" value=\"$adr1\"></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input type=\"text\" name=\"pbadr2\" maxlength=\"50\" value=\"$adr2\"></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input type=\"text\" name=\"pbadr3\" maxlength=\"50\" value=\"$adr3\"></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input type=\"text\" name=\"pbadr4\" maxlength=\"50\" value=\"$adr4\"></td>
+						</tr>
+						<tr>
+							<td>Contact Number:</td>
+							<td><input type=\"text\" name=\"pbcontactno\" maxlength=\"50\" value=\"$contactno\"></td>
+						</tr>
+						<tr>
+							<td>Fax Number:</td>
+							<td><input type=\"text\" name=\"pbfaxno\" maxlength=\"50\" value=\"$faxno\"></td>
+						</tr>	
+						<tr>
+							<td>Email Address:</td>
+							<td><input type=\"text\" name=\"pbemail\" maxlength=\"50\" value=\"$email\"></td>
+						</tr>
+						<tr>
+							<td>Latitude:</td>
+							<td><input type=\"text\" name=\"latitude\" maxlength=\"50\" value=\"$latitude\"></td>
+						</tr>
+						<tr>
+							<td>Longitude:</td>
+							<td><input type=\"text\" name=\"longitude\" maxlength=\"50\" value=\"$longitude\"></td>
+						</tr>
+					</table>
+					<br><input type=\"submit\" value=\"Save\"> <input type=\"reset\" value=\"Clear\"> <input type=\"hidden\" name=\"panelbeaterid\" value=\"$pbid\">
+			  </form>";
+	}
+	
+	function PanelbeaterEdited($pbid, $name, $owner, $costingclerk, $contactperson, $adr1, $adr2, $adr3, $adr4, $contactno, $faxno, $email,$latitude='',$longitude='')
+	{
+		require('connection.php');
+				
+		$qryupdate = "update panelbeaters set `name` = '$name',
+											  `owner` = '$owner',
+											  `costingclerk` = '$costingclerk',
+											  `contactperson` = '$contactperson',
+											  `adr1` = '$adr1',
+											  `adr2` = '$adr2',
+											  `adr3` = '$adr3',
+											  `adr4` = '$adr4',
+											  `contactno` = '$contactno',
+											  `faxno`= '$faxno',
+											  `latitude`='$latitude',
+											  `longitude`='$longitude',
+											  `email` = '$email' where `id` = $pbid";
+		$qryupdateresults = mysql_query($qryupdate, $db);
+		
+		echo "<p>The Panel Beater has been edited successfully.</p>";
+		
+		Panelbeaters(1);
+		
+	}
+	
+	function ConfirmDeletePanelbeater($pbid, $key)
+	{
+		require('connection.php');
+		///////////include('functions.php');
+						
+		$qry = "select * from panelbeaters where `id` = $pbid";
+		$qryresults = mysql_query($qry, $db);
+		$row = mysql_fetch_array($qryresults);
+		
+		$name = $row["name"];
+		
+		//////////$key = get_rand_id(32);
+		
+		$qryinsert = "insert into `key` (`id`, `key`, `action`) values ('', '$key', 'deletepanelbeater')";
+		$qryinsertresults = mysql_query($qryinsert, $db);
+		
+		echo "<p>Are you sure you want to delete the Panel Beater <strong>$name</strong>?<br> <a href=\"loggedinaction.php?action=deletepanelbeater&amp;panelbeaterid=$pbid&amp;key=$key\">Yes</a> | <a href=\"javascript:history.go(-1)\">No</a></p>";						
+		
+	}
+	
+	function DeletePanelbeater($pbid, $key)
+	{
+		require('connection.php');
+								
+		$qry = "select * from `key` where `action` = 'deletepanelbeater' and `key` = '$key'";
+		$qryresults = mysql_query($qry, $db);						
+		
+		$keyrow = mysql_fetch_array($qryresults);
+		
+		$keyid = $keyrow["id"];						
+		$count = mysql_num_rows($qryresults);
+		
+		if ($count == 1)
+		{
+			$qrydelete = "delete from `key` where `id` = $keyid";
+			$qrydeleteresults = mysql_query($qrydelete, $db);
+			
+			$qrydelete = "delete from panelbeaters where `id` = $pbid";
+			$qrydeleteresults = mysql_query($qrydelete, $db);
+			
+			echo "<p>The Panel Beater has been deleted successfully.</p>";
+			Panelbeaters(1);
+		}
+		else
+		{
+			echo "<p>It wont work if you enter the url just like that to delete a panel beater...</p>";
+			Panelbeaters(1);
+		}
+	}
+
+?>

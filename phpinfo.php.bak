@@ -1,0 +1,3 @@
+<?php
+phpinfo();
+//max_input_vars
