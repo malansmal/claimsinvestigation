@@ -2527,7 +2527,7 @@ function EditClaim($id, $step)
 
 									foreach($partsuppliers as $supplier) {
 
-										$ps_string = ucwords(trim($supplier["name"])) . ', ' . ucwords(trim($supplier["contactname"])) . ', Tel:' . $supplier["telno"] . ', Fax:' . $supplier["faxno"] . ', Cel:' . $supplier["cellno"] . ', Email:' . $supplier["email"];
+										$ps_string = ucwords(trim($supplier["contactname"])) . ', ' . ucwords(trim($supplier["name"])) . ', Tel:' . $supplier["telno"] . ', Fax:' . $supplier["faxno"] . ', Cel:' . $supplier["cellno"] . ', Email:' . $supplier["email"];
 
 										$supplier["email2"] = trim($supplier["email2"]);
 
