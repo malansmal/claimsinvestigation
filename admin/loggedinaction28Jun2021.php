@@ -8,7 +8,7 @@
 
 	setcookie("loggedincookie", "", mktime(12,0,0,1, 1, 1990));
 
-	setcookie("loggedincookie", $cookie, time() + 3600);
+	setcookie("loggedincookie", $cookie, time() + 3600*5);
 
 	
 
@@ -55,6 +55,9 @@
 	include('towingoperators.php');
 
 	include('vehicletype.php');
+
+	include('adverts.php');
+
 
 ?>
 
@@ -120,7 +123,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 <?php
 	$containerClass = "container";
 	
-	$fluidPages = ["editclaim", "newclaim", "panelbeaters", "assessors", "addnewassessor", "confirmdeleteassessor", "assessoredited", "partssuppliers", "addnewpartsupplier", "partssupplieredited", "confirmdeletepartssupplier", "send-profile-link-to-panelbeater", "deletepanelbeater", "panelbeateredited"];
+	$fluidPages = ["editclaim", "newclaim", "panelbeaters", "assessors", "addnewassessor", "confirmdeleteassessor", "assessoredited", "partssuppliers", "addnewpartsupplier", "partssupplieredited", "confirmdeletepartssupplier", "send-profile-link-to-panelbeater", "send-profile-link-to-partsuppliers", "deletepanelbeater", "panelbeateredited", "send-profile-link-to-towingoperator", "searchpanelbeaters", "towingoperators", "towingoperatoredited"];
 
 	$pageaction = isset($_GET['action']) ? $_GET['action'] : "";
 
@@ -200,8 +203,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						$from = isset($_REQUEST["from"]) ? $_REQUEST["from"] : '';
 
-												
-
 						Claims($from, $admin);							
 
 					}	
@@ -229,6 +230,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 					if ($action == "searchclaims")
 
 					{
+					    $fieldId = $_REQUEST["fieldId"];
 
 						$claimno = $_REQUEST["claimno"];
 
@@ -242,7 +244,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						$from = $_REQUEST["from"];
 
-						SearchClaims($claimno, $clientno, $clientname, $vehicleregistrationno, $from, $admin, $panelbeatername);
+						SearchClaimsWithId($fieldId, $claimno, $clientno, $clientname, $vehicleregistrationno, $from, $admin, $panelbeatername);
 
 					}	
 
@@ -286,7 +288,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						if ($admin == 0)
 
-						{						
+						{					
 
 							echo "
 							
@@ -310,7 +312,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number5: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -318,7 +320,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 									
 									Vehicle Registration Number: <input type=\"text\" name=\"vehicleregistrationno\"> 
 
-									Panel Beater: <input type=\"text\" name=\"panelbeatername\" id=\"panelbeatername\" /> 
+									Panelbeater: <input type=\"text\" name=\"panelbeatername\" id=\"panelbeatername\" /> 
 
 									<input type=\"submit\" value=\"Search\">
 
@@ -332,7 +334,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						}
 
-						
 
 						$pbid = $_REQUEST["pbid"];
 
@@ -407,6 +408,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 						$quoteno = addslashes($_REQUEST["quoteno"]);
 
 						$insurerid = addslashes($_REQUEST["insurerid"]);
+						$brokerid = addslashes($_REQUEST["brokerid"]);
 
 						$claimsclerkid = addslashes($_REQUEST["claimsclerk"]);
 
@@ -422,8 +424,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						$assessorid = $_REQUEST["assessor"];
 
-						
-
 						if ($admin == 0)
 
 						{						
@@ -432,7 +432,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number6: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -483,7 +483,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						AddNewClaim($clientname, $clientno, $claimno, $clientcontactno1, $clientcontactno2, $clientemail, $panelbeaterid, $vehiclemakemodel, 
 
-						 $vehicleregistrationno, $vehicleyear, $vehicletype, $administratorid, $quoteno, $insurerid, $claimsclerkid, 
+						 $vehicleregistrationno, $vehicleyear, $vehicletype, $administratorid, $quoteno, $insurerid, $brokerid, $claimsclerkid, 
 
 						 $authamount, $excess, $betterment, $quoteamount, $assessorid, $pbname, $pbowner, $pbcostingclerk, $pbcontactperson, $workshopmanager,
 
@@ -514,7 +514,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 					if ($action == "editclaim")
 
 					{					
-
+                      
 						$claimid = $_REQUEST["claimid"];
 
 
@@ -556,10 +556,12 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 							
 							
 							<form action=\"loggedinaction.php?action=searchclaims\" method=\"post\" name=\"searchform\">
-
+                                
 									<strong>Search for a claim:</strong><br>
-
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									
+                                    File ID: <input type=\"text\" name=\"fieldId\"> 
+									
+									Client Number7: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -567,7 +569,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 									
 									Vehicle Registration Number: <input type=\"text\" name=\"vehicleregistrationno\">
 
-									Panel Beater: <input type=\"text\" name=\"panelbeatername\" id=\"panelbeatername\">
+									Panelbeater: <input type=\"text\" name=\"panelbeatername\" id=\"panelbeatername\">
 									
 									<input type=\"submit\" value=\"Search\">
 
@@ -581,7 +583,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						$stepto = $_REQUEST["stepto"];
 
-						
+						//print_r($stepto);exit;
 
 						EditClaim($claimid, $stepto);		
 
@@ -651,7 +653,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number8: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -710,7 +712,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number9: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -830,7 +832,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number10: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -892,7 +894,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number11: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -966,7 +968,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number12: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1026,7 +1028,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number13: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1088,7 +1090,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number14: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1146,7 +1148,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number15: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1214,7 +1216,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number16: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1274,7 +1276,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number17: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1332,7 +1334,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number18: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1390,7 +1392,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number19: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1450,7 +1452,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number1: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1531,6 +1533,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 						$quoteno = addslashes($_REQUEST["quoteno"]);
 
 						$insurerid = addslashes($_REQUEST["insurerid"]);
+						$brokerid = addslashes($_REQUEST["brokerid"]);
 
 						$claimsclerkid = addslashes($_REQUEST["claimsclerk"]);
 
@@ -1584,7 +1587,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number2: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1606,7 +1609,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									$vehiclemakemodel, $vehicleregistrationno, $vehicleyear, $vehicletype, $administratorid, $quoteno, 
 
-									$insurerid, $claimsclerkid, $authamount, $excess, $betterment, $quoteamount, $assessorid, 
+									$insurerid, $brokerid, $claimsclerkid, $authamount, $excess, $betterment, $quoteamount, $assessorid, 
 
 									$pbname, $pbowner, $pbcostingclerk, $pbcontactperson, $workshopmanager, $pbcontactnumber, $pbfaxno, $pbemail, $pbadr1, $pbadr2, 
 
@@ -1658,7 +1661,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number3: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1716,7 +1719,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									<strong>Search for a claim:</strong><br>
 
-									Client Number: <input type=\"text\" name=\"clientno\"> 
+									Client Number4: <input type=\"text\" name=\"clientno\"> 
 
 									Client Name: <input type=\"text\" name=\"clientname\">
 
@@ -1800,11 +1803,11 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						
 
-						$from = $_REQUEST["from"];						
-
+						$from = $_REQUEST["from"];	
 						
-
-						SearchPanelbeaters($pbname, $pbowner, $from);
+						
+						Panelbeaters($from, $pbname, $pbowner);
+						//SearchPanelbeaters($pbname, $pbowner, $from);
 
 					}	
 
@@ -2020,6 +2023,18 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 					
 						$pbid = $_GET['panelbeaterid'];
 						SendProfileLinkToPanelbeater($pbid);
+					}
+
+					if ($action == 'send-profile-link-to-partsuppliers') {
+					
+						$psid = $_GET['id'];
+						SendProfileLinkToPartSupplier($psid);
+					}
+
+					if ($action == 'send-profile-link-to-towingoperator') {
+					
+						$twid = $_GET['towingoperatorid'];
+						SendProfileLinkToTowingOperator($twid);
 					}
 
 
@@ -2670,7 +2685,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 						
 
-						echo "	<p>Select which report you want to view:<br><br>
+						echo "	<p>Select which reports you want to view:<br><br>
 
 									<a href=\"reports.php?action=assessmentinstruction&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Assessment Instruction</a>
 
@@ -2680,9 +2695,11 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 									|| <a href=\"reports.php?action=authorization&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Authorization for Repairs</a>
 
-									|| <a href=\"reports.php?action=pbdocrequest&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Panel Beater Document Request</a>
+									|| <a href=\"reports.php?action=pbdocrequest&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Panelbeater Document Request</a>
 
-									|| <a href=\"reports.php?action=pbfax&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Panel Beater Fax 111</a> 								
+									|| <a href=\"reports.php?action=pbpartsrequest&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Panelbeater Parts Request</a>
+									
+									|| <a href=\"reports.php?action=pbfax&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Panelbeater Fax 111</a> 								
 
 									|| <a href=\"reports.php?action=auditreport&amp;claimid=$claimid\"  target=\"_blank\" class=\"newWindow\">Audit Report</a> 
 
@@ -3586,6 +3603,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 						$adr4 = addslashes($_REQUEST["adr4"]);
 
 						$vatno = addslashes($_REQUEST["vatno"]);
+
 						
 
 						AdministratorEdited($adminid, $name, $telno, $faxno, $adr1, $adr2, $adr3, $adr4, $vatno);
@@ -3821,6 +3839,80 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 						$key = $_REQUEST["key"];
 
 						DeleteVehicleType($vehicletypeid, $key);
+
+					}
+
+
+
+
+
+
+
+
+
+
+
+
+
+					// Adverts
+					
+					else if ($action == "adverts") {
+						
+						$from = $_REQUEST['from'];
+
+						Adverts($from);
+
+					}
+					
+					else if ($action == "newadvert") {
+
+						NewAdvert();
+
+					}
+
+					else if ($action == "addnewadvert") {
+
+						$advertname = addslashes($_REQUEST["advertname"]);
+
+						$link = addslashes($_REQUEST["link"]);
+
+						AddNewAdvert($advertname, $link);
+
+					}
+					else if ($action == "editadvert") {
+
+						$advertid = $_REQUEST["advertid"];
+
+						EditAdvert($advertid);
+
+					}
+					else if ($action == "advertedited") {
+
+						$advertid = $_REQUEST["advertid"];
+
+						$advertname = addslashes($_REQUEST["advertname"]);
+
+						$link = addslashes($_REQUEST["link"]);
+
+						AdvertEdited($advertid, $advertname, $link);
+
+					}
+					else if ($action == "confirmdeleteadvert") {
+
+						$advertid = $_REQUEST["advertid"];
+
+						$key = get_rand_id(32);
+
+						ConfirmDeleteAdvert($advertid, $key);
+
+					}
+					else if ($action == "deleteadvert") {
+
+						$advertid = $_REQUEST["advertid"];
+
+						$key = $_REQUEST["key"];
+
+						DeleteAdvert($advertid, $key);
 
 					}
 
@@ -4141,19 +4233,6 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 
 
-					if ($action == "editbroker")
-
-					{
-
-						$brokerid = $_REQUEST["brokerid"];
-
-						
-
-						EditBroker($brokerid);
-
-					}
-
-
 
 /***************************************************************************			
 
@@ -4437,6 +4516,34 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 			END OF EDITINSURER SECTION
 
+***************************************************************************/
+
+/***************************************************************************			
+
+			START OF EDITBROKER SECTION
+
+***************************************************************************/
+
+
+
+					if ($action == "editbroker")
+
+					{
+
+						$brokerid = $_REQUEST["brokerid"];
+
+						
+
+						Editbroker($brokerid);
+
+					}
+
+
+
+/***************************************************************************			
+
+			END OF EDITBROKER SECTION
+
 ***************************************************************************/	
 
 
@@ -4480,7 +4587,20 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 ***************************************************************************/
 
 
+/***************************************************************************			
 
+			START OF BROKEREDITED SECTION
+
+***************************************************************************/
+
+
+
+
+/***************************************************************************			
+
+			END OF BROKEREDITED SECTION
+
+***************************************************************************/
 
 
 /***************************************************************************			
